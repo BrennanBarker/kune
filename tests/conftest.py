@@ -39,6 +39,7 @@ class AuthActions(object):
 def auth(client):
     return AuthActions(client)
 
+
 # CLI
 @pytest.fixture
 def cli_runner():
