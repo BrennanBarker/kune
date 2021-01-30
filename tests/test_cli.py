@@ -1,19 +1,14 @@
-#!/usr/bin/env python
-
 """Tests for `kune` package."""
-
-import pytest
-
-from click.testing import CliRunner
 
 from kune import cli
 
-def test_command_line_interface():
+def test_command_line_interface(cli_runner):
     """Test the CLI."""
-    runner = CliRunner()
-    result = runner.invoke(cli.main)
+    result = cli_runner.invoke(cli.main)
     assert result.exit_code == 2
     assert 'Error: Missing argument "HTML_FILE".' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
+    
+def test_cli_help(cli_runner):
+    help_result = cli_runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert 'Show this message and exit.' in help_result.output

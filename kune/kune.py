@@ -12,8 +12,6 @@ def update_cursor(cursor_file, cursor_position):
         json.dump({'cursor': cursor_position}, f)
 
 def get_cursor(cursor_file):
-    if not os.path.exists(cursor_file):
-        update_cursor(cursor_file, '#')
     with open(cursor_file, 'r') as f:
         return json.load(f)['cursor']
 
@@ -36,6 +34,8 @@ def create_app(html_file, config=None):
     except OSError:
         pass
     
+    update_cursor(app.config['CURSOR_FILE'], '')
+    
     def create_template(html_file):
         sync_scripts_block = '{% block sync_scripts %}{% endblock %}'
         with open(html_file) as f:
@@ -44,13 +44,16 @@ def create_app(html_file, config=None):
                                      f'{sync_scripts_block}\n</head>'))
     
     @app.route('/')
+    @app.route('/follow')
     def index():
-        return redirect(url_for('following', _anchor=get_cursor(app.config['CURSOR_FILE'])[1:]))
+        cursor = get_cursor(app.config['CURSOR_FILE'])[1:]  # flask doesn't want the #
+        return redirect(url_for('following', _anchor=cursor))
 
     @app.route(f"/{app.config['LEADER_TOKEN']}")
     def lead():
         session['is_leader'] = True
-        return redirect(url_for('leading', _anchor=get_cursor(app.config['CURSOR_FILE'])[1:]))
+        cursor = get_cursor(app.config['CURSOR_FILE'])[1:]  # flask doesn't want the #
+        return redirect(url_for('leading', _anchor=cursor))
 
     @app.route('/following')
     def following():
