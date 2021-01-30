@@ -65,7 +65,7 @@ def test_relinquish_lead(client, auth):
         assert request.path == '/leading'
         assert_is_leader(response)
         response = auth.relinquish_lead()
-        assert request.path == '/cfollowing'
+        assert request.path == '/following'
         assert_is_follower(response)
         
 def test_cursor_change_follower(client, app):
