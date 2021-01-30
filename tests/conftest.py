@@ -12,14 +12,17 @@ from kune import kune
 def test_page():
     return resource_filename('tests.resources', 'test_page.html')
 
+
 @pytest.fixture
 def app(test_page):
     """Calls the kune app factory and configures for testing"""
-    yield kune.create_app(test_page, config={'TESTING': True,})
+    yield kune.create_app(test_page, config={'TESTING': True})
+
 
 @pytest.fixture
 def client(app):
     return app.test_client()
+
 
 class AuthActions(object):
     def __init__(self, client):
@@ -29,8 +32,9 @@ class AuthActions(object):
         return self._client.get('/lead', follow_redirects=True)
 
     def relinquish_lead(self):
-        return self._client.get('/', follow_redirects=True)  # could also be '/follow'
-                  
+        return self._client.get('/', follow_redirects=True)
+
+
 @pytest.fixture
 def auth(client):
     return AuthActions(client)
