@@ -10,3 +10,6 @@ twine==3.3.0
 Click==7.1.2
 pytest==6.2.2
 pytest-runner==5.2
+eventlet==0.30.0
+Flask==1.1.2
+Flask-SocketIO==5.0.1
