@@ -17,3 +17,9 @@ History
 -----------------
 
 * Drop support for Python 3.5
+
+0.1.3 (2021-01-30)
+------------------
+
+* Several bugfixes
+* Improved test coverage
