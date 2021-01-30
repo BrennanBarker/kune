@@ -23,3 +23,4 @@ History
 
 * Several bugfixes
 * Improved test coverage
+* Upgrade third-party dependencies
