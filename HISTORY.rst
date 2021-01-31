@@ -29,3 +29,13 @@ History
 
 * Upgrade third-party dependencies
 * style fixes in codebase
+
+0.2.1 (2021-01-30)
+------------------
+
+* Bugfixes
+
+0.2.2 (2021-01-30)
+------------------
+
+* Bugfixes
