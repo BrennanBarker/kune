@@ -14,7 +14,7 @@ History
 * Updates to travis config
 
 0.1.2 (2021-01-27)
------------------
+------------------
 
 * Drop support for Python 3.5
 
