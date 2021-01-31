@@ -13,11 +13,9 @@ kune
         :target: https://kune.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
-
-.. image:: https://pyup.io/repos/github/brennan.barker/kune/shield.svg
-     :target: https://pyup.io/repos/github/brennan.barker/kune/
-     :alt: Updates
-
+.. image:: https://pyup.io/repos/github/BrennanBarker/kune/shield.svg
+     :target: https://pyup.io/repos/github/BrennanBarker/kune/
+          :alt: Updates
 
 
 Host your live HTML presentations in sync across many devices.
