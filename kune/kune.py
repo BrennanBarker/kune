@@ -1,6 +1,7 @@
 """The kune flask app for serving synced slides."""
 
 import os
+import os.path
 import json
 from flask import Flask, render_template, redirect, url_for, session, abort
 from flask_socketio import SocketIO, emit
@@ -19,7 +20,11 @@ def get_cursor(cursor_file):
 
 def create_app(html_file, config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True,
+                # Serve static files from a static folder in the directory
+                # where `kune` is run.
+                static_folder=os.path.abspath('static')
+               )
 
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -42,8 +47,24 @@ def create_app(html_file, config=None):
         sync_scripts_block = '{% block sync_scripts %}{% endblock %}'
         with open(html_file) as f:
             html = f.read()
-        return Template(html.replace('</head>',
-                                     f'{sync_scripts_block}\n</head>'))
+        return Template(html.replace('</title>',
+                                     f'</title>\n{sync_scripts_block}\n'))
+    
+    def copy_static_files():
+        # create_app gets new param,defaulting to none
+        # if none, proceed
+        # elif file exists
+            # copy contents to static (recursively, in case of subdirectories)
+            # prepend static on html (should work as a plain page prior)
+                # might end up with 'static/static', that should be ok
+            # clear on teardown (teardown_appcontext_funcs)
+        # else throw error
+        # Clear on teardown?
+        
+        # OR
+        # can I just set it as a static_url_path?
+        pass
+    
 
     @app.route('/')
     @app.route('/follow')

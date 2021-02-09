@@ -3,8 +3,14 @@
 from kune import kune
 from flask import session, request
 
-# Switch lead to leader token
-# Refactor to auth?
+
+def take_lead(app, client, follow_redirects=False):
+    return client.get(f"/{app.config['LEADER_TOKEN']}",
+                      follow_redirects=follow_redirects)
+
+
+def relinquish_lead(app, client, follow_redirects=False):
+    return client.get('/', follow_redirects=follow_redirects)
 
 
 def assert_is_follower(response):
@@ -21,9 +27,9 @@ def assert_is_leader(response):
     assert b'function notify_server' in response.data
 
 
-def test_config(test_page):
-    assert not kune.create_app(test_page).testing
-    assert kune.create_app(test_page, {'TESTING': True}).testing
+def test_config(page):
+    assert not kune.create_app(page).testing
+    assert kune.create_app(page, {'TESTING': True}).testing
 
 
 def test_bad_route(client):
@@ -48,38 +54,35 @@ def test_unauthorized_leading(app, client):
         assert client.get('/leading').status_code == 403  # Forbidden
 
 
-def test_lead_redirect(client):
-    response = client.get('/lead')
+def test_lead_redirect(app, client):
+    response = take_lead(app, client)
     assert response.status_code == 302  # Redirect
     assert response.headers['Location'] == 'http://localhost/leading'
 
 
-def test_lead(client):
+def test_lead(app, client):
     with client:
-        response = client.get('/lead', follow_redirects=True)
+        response = take_lead(app, client, follow_redirects=True)
         assert_is_leader(response)
 
 
-def test_leader(client, auth, app):
+def test_leader(app, client):
     with client:
-        assert client.get('/', follow_redirects=True).status_code == 200
-        response = auth.take_lead()
+        response = take_lead(app, client, follow_redirects=True)
+        assert response.status_code == 200
         assert request.path == '/leading'
         assert_is_leader(response)
 
 
-def test_relinquish_lead(client, auth):
+def test_relinquish_lead(app, client):
     with client:
-        assert client.get('/', follow_redirects=True).status_code == 200
-        response = auth.take_lead()
-        assert request.path == '/leading'
-        assert_is_leader(response)
-        response = auth.relinquish_lead()
+        response = take_lead(app, client, follow_redirects=True)       
+        response = relinquish_lead(app, client, follow_redirects=True)
         assert request.path == '/following'
         assert_is_follower(response)
 
 
-def test_cursor_change_follower(client, app):
+def test_cursor_change_follower(app, client):
     with client:
         response_pre_cursor_change = client.get('/')
         assert (response_pre_cursor_change.headers['Location'] ==
@@ -91,14 +94,14 @@ def test_cursor_change_follower(client, app):
                 'http://localhost/following#2')
 
 
-def test_cursor_change_leader(client, app):
+def test_cursor_change_leader(app, client):
     with client:
-        response_pre_cursor_change = client.get('/lead')
+        response_pre_cursor_change = take_lead(app, client)
         assert (response_pre_cursor_change.headers['Location'] ==
                 'http://localhost/leading')
         kune.update_cursor(app.config['CURSOR_FILE'], '#2')
         assert kune.get_cursor(app.config['CURSOR_FILE']) == '#2'
-        response_post_cursor_change = client.get('/lead')
+        response_post_cursor_change = take_lead(app, client)
         assert (response_post_cursor_change.headers['Location'] ==
                 'http://localhost/leading#2')
 
@@ -108,3 +111,8 @@ def test_cursor_reset(client):  # Place after test_cursor_change
         response_pre_cursor_change = client.get('/')
         assert (response_pre_cursor_change.headers['Location'] ==
                 'http://localhost/following')
+
+
+def test_get_static_file(client):
+    assert client.get('/static/style.css').status_code == 200
+
